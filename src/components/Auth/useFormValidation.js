@@ -1,6 +1,6 @@
 import React from "react";
 
-function useFormValidation(initialState, validate) {
+function useFormValidation(initialState, validate, authenticate) {
     const [values, setValues] = React.useState(initialState)
     const [errors, setErrors] = React.useState({})
     const [isSubmitting, setSubmitting] = React.useState(false)
@@ -9,6 +9,7 @@ function useFormValidation(initialState, validate) {
         if (isSubmitting) {
             const noErrors = Object.keys(errors).length === 0 
             if (noErrors) {
+                authenticate()
                 console.log('Authenticated', values)
                 setSubmitting(false)
             } else {
@@ -36,9 +37,7 @@ function useFormValidation(initialState, validate) {
         const validationErrors = validate(values)
         setErrors(validationErrors)
         setSubmitting(true)
-        console.log({values})
     }
-
     return { handleChange, handleSubmit, handleBlur, values, errors, isSubmitting }
 }
 export default useFormValidation;
