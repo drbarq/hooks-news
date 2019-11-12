@@ -1,5 +1,6 @@
 import React from "react";
 import useFormValidation from './useFormValidation'
+import validateLogin from './validateLogin'
 
 const INITIAL_STATE = {
   name: "",
@@ -8,7 +9,7 @@ const INITIAL_STATE = {
 }
 
 function Login(props) {
-  const { handleChange, handleSubmit, values } = useFormValidation(INITIAL_STATE)
+  const { handleChange, handleSubmit, values } = useFormValidation(INITIAL_STATE, validateLogin)
   const [login, setLogin] =  React.useState(true)
 
   return (
