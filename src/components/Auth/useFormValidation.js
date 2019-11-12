@@ -31,7 +31,7 @@ function useFormValidation(initialState, validate) {
         setErrors(validationErrors)
     }
 
-    function handleSumbit(event) {
+    function handleSubmit(event) {
         event.preventDefault()
         const validationErrors = validate(values)
         setErrors(validationErrors)
@@ -39,6 +39,6 @@ function useFormValidation(initialState, validate) {
         console.log({values})
     }
 
-    return { handleChange, handleSumbit, handleBlur, values, errors, isSubmitting }
+    return { handleChange, handleSubmit, handleBlur, values, errors, isSubmitting }
 }
 export default useFormValidation;

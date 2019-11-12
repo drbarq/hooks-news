@@ -9,13 +9,13 @@ const INITIAL_STATE = {
 }
 
 function Login(props) {
-  const { handleChange, handleSubmit, values } = useFormValidation(INITIAL_STATE, validateLogin)
+  const { handleChange, handleSubmit, handleBlur, values, errors, isSubmitting  } = useFormValidation(INITIAL_STATE, validateLogin)
   const [login, setLogin] =  React.useState(true)
 
   return (
     <div>
       <h2 className="mv3"> {login ? "Login" : "Create Account"}  </h2>
-      <form onSubmit={handleSubmit} className="flex flex-column">
+      <form onSubmit={handleSubmit} className="flex flex-column" >
         { !login && (<input
           onChange={handleChange}
           value={values.name}
@@ -26,24 +26,32 @@ function Login(props) {
         />)}
         <input
           onChange={handleChange}
+          onBlur={handleBlur}
           value={values.email}
           name="email"
           type="email"
+          className={errors.email && 'error-input'}
           placeholder="Your email"
           autoComplete="off"
         />
+        {errors.email && <p className="error-text">{errors.email}</p>}
         <input
           onChange={handleChange}
+          onBlur={handleBlur}
           value={values.password}
+          className={errors.password && 'error-input'}
           name="password"
           type="password"
           placeholder="Choose a secure password"
           autoComplete="off"
         />
+        {errors.password && <p className="error-text">{errors.password}</p>}
         <div className="flex mt3">
           <button
             type="submit"
             className="button pointer mr2"
+            disabled={isSubmitting}
+            style={{background: isSubmitting ? "grey" : "orange" }}
           >
             Submit
           </button>
