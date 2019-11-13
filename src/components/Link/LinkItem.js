@@ -5,7 +5,6 @@ import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import { FirebaseContext } from "../../firebase";
 
 function LinkItem({link, index, showCount, history}) {
-
   const { firebase, user } = React.useContext(FirebaseContext)
   
   function handleVote() {
@@ -26,8 +25,17 @@ function LinkItem({link, index, showCount, history}) {
       // specify what value specifically you want to update
     }
   }
+  // was the link posted by the same user who wants to delete it?
+  const postedByAuthUser = user && user.uid === link.postedBy.id
 
-
+  function handleDeleteLink() {
+    const linkRef = firebase.db.collection('links').doc(link.id)
+    linkRef.delete().then(() => {
+      console.log(`Document with ID ${link.id} deleted`)
+    }).catch(err => {
+      console.error(`Error deleting document:`, err)
+    })
+  }
 
 
   return (
@@ -48,6 +56,12 @@ function LinkItem({link, index, showCount, history}) {
             ? `${link.comments.length} comments`
             : "discuss"}
           </Link>
+          {postedByAuthUser && (
+            <>
+            {" | "}
+            <span className="delete-button" onClick={handleDeleteLink}>delete</span>
+            </>
+          )}
         </div>
       </div>
     </div>
