@@ -3,7 +3,7 @@ import 'firebase/auth'
 import firebaseConfig from './config'
 
 
-class Firebaase {
+class Firebase {
     constructor() {
         app.initializeApp(firebaseConfig);
         this.auth = app.auth()
@@ -32,5 +32,5 @@ class Firebaase {
 
 }
 
-const firebase = new Firebaase()
+const firebase = new Firebase()
 export default firebase
