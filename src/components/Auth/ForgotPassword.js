@@ -11,6 +11,7 @@ function ForgotPassword() {
     try {
       await firebase.resetPassword(resetPasswordEmail)
       setIsPasswordReset(true)
+      setPasswordError(null)
     } catch (err) {
       console.error("Error Sending Email", err)
       setPasswordError(err.message)
