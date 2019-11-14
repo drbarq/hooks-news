@@ -8,6 +8,8 @@ class Firebase {
     constructor() {
         app.initializeApp(firebaseConfig);
         this.auth = app.auth()
+        // this.gAuth = app.auth()
+        // this.gAuth = app.auth.GoogleAuthProvider();
         this.db = app.firestore()
     }
     async register(name, email, password) {
@@ -19,6 +21,11 @@ class Firebase {
             displayName: name
         })
     }
+
+    async googleLogin() {
+        return this.auth().signInWithRedirect(this.gAuth)
+    }
+
 
     async login(email, password) {
         return await this.auth.signInWithEmailAndPassword(email, password)
