@@ -4,6 +4,10 @@ import validateLogin from './validateLogin'
 import firebase from '../../firebase'
 import { Link } from 'react-router-dom'
 
+// import firebaseui from 'firebaseui'
+var firebase2 = require('firebase');
+const firebaseui = require('firebaseui');
+
 const INITIAL_STATE = {
   name: "",
   email: "",
@@ -14,6 +18,9 @@ function Login(props) {
   const { handleChange, handleSubmit, handleBlur, values, errors, isSubmitting  } = useFormValidation(INITIAL_STATE, validateLogin, authenticateUser)
   const [login, setLogin] =  React.useState(true)
   const [firebaseError, setFirebaseError] = React.useState(null)
+  const ui = new firebaseui.auth.AuthUI(firebase2.auth());
+  // const ui = new firebaseui.auth.AuthUI(this.auth);
+
 
   async function authenticateUser() {
     const { name, email, password } = values 
@@ -29,8 +36,56 @@ function Login(props) {
     } 
   }
 
+  const uiConfig = {
+    callbacks: {
+      signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+        // User successfully signed in.
+        // Return type determines whether we continue the redirect automatically
+        // or whether we leave that to developer to handle.
+        return true;
+      },
+      uiShown: function() {
+        // The widget is rendered.
+        // Hide the loader.
+        document.getElementById('loader').style.display = 'none';
+      }
+    },
+    // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+    signInFlow: 'popup',
+    signInSuccessUrl: '<url-to-redirect-to-on-success>',
+    signInOptions: [
+      // Leave the lines as is for the providers you want to offer your users.
+      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+      // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+      // firebase.auth.GithubAuthProvider.PROVIDER_ID,
+      // firebase.auth.EmailAuthProvider.PROVIDER_ID,
+      // firebase.auth.PhoneAuthProvider.PROVIDER_ID
+    ],
+    // Terms of service url.
+    tosUrl: '<your-tos-url>',
+    // Privacy policy url.
+    privacyPolicyUrl: '<your-privacy-policy-url>'
+  };
+  
+
+  async function authTest()  {
+    // ui.start('#firebaseui-auth-container', uiConfig);
+
+      ui.start('#firebaseui-auth-container', {
+        signInOptions: [
+          {
+            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID
+          }
+        ],
+        // Other config options...
+    });
+  }
+
+
   return (
     <div>
+      <div id="firebaseui-auth-container">{authTest}</div>
       <h2 className="mv3"> {login ? "Login" : "Create Account"}  </h2>
       <form onSubmit={handleSubmit} className="flex flex-column" >
         { !login && (<input
