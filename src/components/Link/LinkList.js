@@ -2,6 +2,7 @@ import React from "react";
 import { FirebaseContext } from "../../firebase";
 import LinkItem from './LinkItem'
 import { LINKS_PER_PAGE } from '../../utils/index'
+import axios from 'axios'
 
 function LinkList(props) {
   const { firebase } = React.useContext(FirebaseContext)
@@ -26,9 +27,22 @@ function LinkList(props) {
       return firebase.db.collection('links').orderBy('created', 'desc').limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
     } else if (hasCursor) {
       return firebase.db.collection('links').orderBy('created', 'desc').startAfter(cursor.created).limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
+    } else {
+      const offset = page * LINKS_PER_PAGE - LINKS_PER_PAGE
+      axios.get(`https://us-central1-udemy-hooks.cloudfunctions.net/linksPagination?offset=${offset}`)
+        .then(response => {
+          console.log(response)
+          const links = response.data
+          const lastlink = links[links.length -1]
+          setLinks(links)
+          setCursor(lastlink)
+        })
+        return () => {}
     }
     // get all the links collection and sort them 
   }
+
+
 
   function handleSnapshot(snapshot) {
     const links = snapshot.docs.map(doc => {
@@ -50,7 +64,7 @@ function LinkList(props) {
     }
   }
 
-  const pageIndex = page ? (page - 1) * LINKS_PER_PAGE + 1 : 1 
+  const pageIndex = page ? (page - 1) * LINKS_PER_PAGE + 1 : 1
 
   return (
     <div>
