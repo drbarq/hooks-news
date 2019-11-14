@@ -8,9 +8,11 @@ function LinkList(props) {
   const { firebase } = React.useContext(FirebaseContext)
   const [ links, setLinks ] = React.useState([])
   const [cursor, setCursor] = React.useState(null)
+  const [ loading, setLoading] = React.useState(false)
   const isNewPage = props.location.pathname.includes("new")
   const isTopPage = props.location.pathname.includes("top")
   const page = Number(props.match.params.page)
+  const linksRef = firebase.db.collection('links')
 
 
   React.useEffect(() => {
@@ -19,14 +21,15 @@ function LinkList(props) {
   }, [isTopPage, page])
 
   function getLinks() {
+    setLoading(true)
     const hasCursor = Boolean(cursor)
     // firebase.db.collection('links').onSnapshot(handleSnapshot)
     if (isTopPage) {
-      return firebase.db.collection('links').orderBy('voteCount', 'desc').limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
+      return linksRef.orderBy('voteCount', 'desc').limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
     } else if (page === 1)  {
-      return firebase.db.collection('links').orderBy('created', 'desc').limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
+      return linksRef.orderBy('created', 'desc').limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
     } else if (hasCursor) {
-      return firebase.db.collection('links').orderBy('created', 'desc').startAfter(cursor.created).limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
+      return linksRef.orderBy('created', 'desc').startAfter(cursor.created).limit(LINKS_PER_PAGE).onSnapshot(handleSnapshot)
     } else {
       const offset = page * LINKS_PER_PAGE - LINKS_PER_PAGE
       axios.get(`https://us-central1-udemy-hooks.cloudfunctions.net/linksPagination?offset=${offset}`)
@@ -36,13 +39,12 @@ function LinkList(props) {
           const lastlink = links[links.length -1]
           setLinks(links)
           setCursor(lastlink)
+          setLoading(false)
         })
         return () => {}
     }
     // get all the links collection and sort them 
   }
-
-
 
   function handleSnapshot(snapshot) {
     const links = snapshot.docs.map(doc => {
@@ -51,6 +53,7 @@ function LinkList(props) {
     const lastLink = links[links.length - 1]
     setLinks(links)
     setCursor(lastLink)
+    setLoading(false)
     console.log(links)
   }
 
@@ -67,7 +70,7 @@ function LinkList(props) {
   const pageIndex = page ? (page - 1) * LINKS_PER_PAGE + 1 : 1
 
   return (
-    <div>
+    <div style={{opacity: loading ? 0.25 : 1}} >
       {links.map((link, index) => (
         <LinkItem key={link.id} showCount={true} link={link} index={index + pageIndex}  />
       ))}
